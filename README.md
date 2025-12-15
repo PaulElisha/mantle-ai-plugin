@@ -69,8 +69,11 @@ import { ethers } from "ethers";
 // Example setup
 async function main() {
   // 1. Initialize simple services
-  const accountService = new AccountServices();
-  const transactionService = new TransactionServices();
+  // Web3 Data tools require an explorer API key (e.g. Etherscan/Mantlescan)
+  const explorerApiKey = process.env.ETHERSCAN_API_KEY as string;
+
+  const accountService = new AccountServices(explorerApiKey);
+  const transactionService = new TransactionServices(explorerApiKey);
   const transferService = new TransferServices();
 
   // 2. Initialize complex services (e.g. Bridges) if needed
@@ -101,15 +104,15 @@ async function main() {
 
 ### Supported Services
 
-| Service               | Description                                                                   | Config Required?                                     |
-| :-------------------- | :---------------------------------------------------------------------------- | :--------------------------------------------------- |
-| `AccountServices`     | Get account balance, NFT/ERC20 holdings (requires explorer API key in params) | No (API key passed at runtime)                       |
-| `TransactionServices` | Get transaction history and block info                                        | No                                                   |
-| `TransferServices`    | Transfer ETH, MNT, ERC20, ERC721, ERC1155                                     | No                                                   |
-| `MNTBridgeService`    | Deposit/Withdraw MNT between L1 and L2                                        | **Yes** (Signers, Chain IDs, Token Addrs) + `init()` |
-| `ERC20BridgeService`  | Deposit/Withdraw ERC20 between L1 and L2                                      | **Yes** (Signers, Chain IDs, Token Addrs) + `init()` |
+| Service               | Description                               | Config Required?                                     |
+| :-------------------- | :---------------------------------------- | :--------------------------------------------------- |
+| `AccountServices`     | Get account balance, NFT/ERC20 holdings   | **Yes** (Explorer API Key)                           |
+| `TransactionServices` | Get transaction history and block info    | **Yes** (Explorer API Key)                           |
+| `TransferServices`    | Transfer ETH, MNT, ERC20, ERC721, ERC1155 | No                                                   |
+| `MNTBridgeService`    | Deposit/Withdraw MNT between L1 and L2    | **Yes** (Signers, Chain IDs, Token Addrs) + `init()` |
+| `ERC20BridgeService`  | Deposit/Withdraw ERC20 between L1 and L2  | **Yes** (Signers, Chain IDs, Token Addrs) + `init()` |
 
-> **Note**: Web3 Data tools (Account/Transaction services) rely on Explorer APIs. Ensure your agent passes the `apikey` parameter when calling these tools.
+> **Note**: Web3 Data tools (Account/Transaction services) rely on Explorer APIs. Ensure you provide a valid API key when initializing the service.
 
 ## Building & Testing
 

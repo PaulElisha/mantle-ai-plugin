@@ -11,7 +11,7 @@ import {
 } from "./parameters";
 
 export class AccountServices {
-  constructor() {}
+  constructor(private apiKey: string) {}
 
   @Tool({
     name: "get_account_overview",
@@ -22,16 +22,15 @@ export class AccountServices {
     walletClient: EVMWalletClient,
     parameters: BaseAccountsParameters
   ) {
-    let { apikey } = parameters;
     const chainid = walletClient.getChain().id as unknown as string;
     const address = walletClient.getAddress();
 
-    validations.checkApiKey(apikey);
+    validations.checkApiKey(this.apiKey);
 
     const baseParams = {
       chainid,
       tag: "latest",
-      apikey,
+      apikey: this.apiKey,
     };
 
     const balanceParams = new URLSearchParams({
@@ -87,11 +86,11 @@ export class AccountServices {
     walletClient: EVMWalletClient,
     parameters: GetNFTBalanceParameters
   ) {
-    let { apikey, offset, page } = parameters;
+    const { page, offset } = parameters;
     const chainid = walletClient.getChain().id as unknown as string;
     const address = walletClient.getAddress();
 
-    validations.checkApiKey(apikey);
+    validations.checkApiKey(this.apiKey);
     validations.checkAddress(address);
 
     const params = new URLSearchParams({
@@ -101,7 +100,7 @@ export class AccountServices {
       address,
       page,
       offset,
-      apikey,
+      apikey: this.apiKey,
     });
 
     const url = `${API_CONFIG.BASE_URL}?${params}`;
@@ -142,11 +141,11 @@ export class AccountServices {
     walletClient: EVMWalletClient,
     parameters: GetERC20BalanceParameters
   ) {
-    let { apikey, offset, page } = parameters;
+    let { offset, page } = parameters;
     const chainid = walletClient.getChain().id as unknown as string;
     const address = walletClient.getAddress();
 
-    validations.checkApiKey(apikey);
+    validations.checkApiKey(this.apiKey);
     validations.checkAddress(address);
 
     const params = new URLSearchParams({
@@ -156,7 +155,7 @@ export class AccountServices {
       address,
       page,
       offset,
-      apikey,
+      apikey: this.apiKey,
     });
 
     const url = `${API_CONFIG.BASE_URL}?${params}`;
@@ -202,11 +201,10 @@ export class AccountServices {
     parameters: BaseAccountsParameters
   ) {
     try {
-      let { apikey } = parameters;
       const chainid = walletClient.getChain().id as unknown as string;
       const address = walletClient.getAddress();
 
-      validations.checkApiKey(apikey);
+      validations.checkApiKey(this.apiKey);
       validations.checkAddress(address);
 
       const params = new URLSearchParams({
@@ -215,7 +213,7 @@ export class AccountServices {
         action: "balance",
         address,
         tag: "latest",
-        apikey,
+        apikey: this.apiKey,
       });
 
       const url = `${API_CONFIG.BASE_URL}?${params}`;

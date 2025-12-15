@@ -11,7 +11,7 @@ import {
 } from "./parameters";
 
 export class TransactionServices {
-  constructor() {}
+  constructor(private apiKey: string) {}
 
   @Tool({
     name: "get_block_info",
@@ -21,10 +21,10 @@ export class TransactionServices {
     walletClient: EVMWalletClient,
     parameters: GetBlockInfoParameters
   ) {
-    let { blockNumber, apikey } = parameters;
+    let { blockNumber } = parameters;
     const chainid = walletClient.getChain().id as unknown as string;
 
-    validations.checkApiKey(apikey);
+    validations.checkApiKey(this.apiKey);
 
     const blockNumberHex = `0x${blockNumber}`;
 
@@ -34,7 +34,7 @@ export class TransactionServices {
       action: "eth_getBlockByNumber",
       tag: blockNumberHex,
       boolean: "true",
-      apikey,
+      apikey: this.apiKey,
     });
 
     const response = await fetch(`${API_CONFIG.BASE_URL}?${params}`, {
@@ -66,16 +66,15 @@ export class TransactionServices {
     walletClient: EVMWalletClient,
     parameters: GetLatestBlockParameters
   ) {
-    let { apikey } = parameters;
     const chainid = walletClient.getChain().id as unknown as string;
 
-    validations.checkApiKey(apikey);
+    validations.checkApiKey(this.apiKey);
 
     const params = new URLSearchParams({
       chainid,
       module: "proxy",
       action: "eth_blockNumber",
-      apikey,
+      apikey: this.apiKey,
     });
 
     const response = await fetch(`${API_CONFIG.BASE_URL}?${params}`, {
@@ -108,7 +107,7 @@ export class TransactionServices {
     walletClient: EVMWalletClient,
     parameters: GetTransactionsByAccountParameters
   ) {
-    let { startblock, endblock, page, offset, apikey } = parameters;
+    let { startblock, endblock, page, offset } = parameters;
     const chainid = walletClient.getChain().id as unknown as string;
     const address = walletClient.getAddress();
 
@@ -124,7 +123,7 @@ export class TransactionServices {
       page,
       offset,
       sort: "desc",
-      apikey,
+      apikey: this.apiKey,
     });
 
     const response = await fetch(`${API_CONFIG.BASE_URL}?${params}`, {
@@ -170,10 +169,10 @@ export class TransactionServices {
     walletClient: EVMWalletClient,
     parameters: GetTransactionsByBlockNumberParameters
   ) {
-    let { blockNumber, apikey } = parameters;
+    let { blockNumber } = parameters;
     const chainid = walletClient.getChain().id as unknown as string;
 
-    validations.checkApiKey(apikey);
+    validations.checkApiKey(this.apiKey);
 
     const blockNumberHex = "0x" + Number(blockNumber).toString(16);
 
@@ -183,7 +182,7 @@ export class TransactionServices {
       action: "eth_getBlockByNumber",
       tag: blockNumberHex,
       boolean: "true",
-      apikey,
+      apikey: this.apiKey,
     });
 
     const response = await fetch(`${API_CONFIG.BASE_URL}?${params}`, {
