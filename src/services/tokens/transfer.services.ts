@@ -8,7 +8,7 @@ import {
   TransferErc721Parameters,
   TransferErc1155Parameters,
   TransferNativeTokenParameters,
-} from "./parameter";
+} from "./parameters";
 
 export class TransferServices {
   constructor() {}

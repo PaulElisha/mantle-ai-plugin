@@ -7,7 +7,7 @@ import {
   GetLatestBlockParameters,
   GetTransactionsByAccountParameters,
   GetTransactionsByBlockNumberParameters,
-} from "./parameters";
+} from "./para"
 
 export class TransactionServices {
   constructor() {}

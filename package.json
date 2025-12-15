@@ -1,7 +1,7 @@
 {
-  "name": "@kaiachain/kaia-agent-kit",
-  "version": "0.0.16",
-  "description": "One stop solution for all Kaia Ecosystem projects",
+  "name": "@paulelisha/mantle-ai-plugin",
+  "version": "0.0.1",
+  "description": "One stop solution for all Mantle Ecosystem projects",
   "files": [
     "dist/**/*",
     "README.md",
@@ -21,7 +21,7 @@
     "@goat-sdk/core": "0.4.9",
     "@goat-sdk/wallet-evm": "0.2.11",
     "@goat-sdk/wallet-viem": "^0.2.12",
-    "@kaiachain/ethers-ext": "^2.0.3",
+    "@mantleio/sdk": "^1.0.5",
     "dotenv": "^16.5.0",
     "viem": "^2.23.15",
     "zod": "^3.24.2"
@@ -31,24 +31,5 @@
     "tsup": "^7.2.0",
     "tsx": "4.19.2",
     "turbo": "2.3.1"
-  },
-  "homepage": "https://kaia.io",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kaiachain/kaia-agent-kit.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/kaiachain/kaia-agent-kit/issues"
-  },
-  "keywords": [
-    "kaia",
-    "agent",
-    "sdk",
-    "typescript",
-    "nodejs",
-    "kaia-agent-kit",
-    "web3",
-    "layer1"
-  ]
+  }
 }
