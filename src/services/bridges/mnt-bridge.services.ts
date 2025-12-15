@@ -1,9 +1,14 @@
 /** @format */
 import { ethers } from "ethers";
 import { Tool } from "@goat-sdk/core";
-import mantleSDK, { CrossChainMessenger, MessageStatus } from "@mantleio/sdk";
+import mantleSDK, {
+  assert,
+  CrossChainMessenger,
+  MessageStatus,
+} from "@mantleio/sdk";
 import { ERC20_ABI } from "../../utils/abi";
 import { DepositParameters, WithdrawParameters } from "./parameters";
+import { EVMWalletClient } from "@goat-sdk/wallet-evm";
 
 export type MNTBridgeConfig = {
   l1Signer: ethers.Signer;
@@ -19,14 +24,12 @@ export class MNTBridgeService {
   private l2Signer!: ethers.Signer;
   private crossChainMessenger!: CrossChainMessenger;
   private l1MntToken!: ethers.Contract;
-  private ourAddr!: string;
 
   constructor(private config: MNTBridgeConfig) {}
 
-  async init() {
+  private async init() {
     this.l1Signer = this.config.l1Signer;
     this.l2Signer = this.config.l2Signer;
-    this.ourAddr = await this.l1Signer.getAddress();
 
     this.crossChainMessenger = new mantleSDK.CrossChainMessenger({
       l1ChainId: this.config.l1ChainId,
@@ -43,17 +46,27 @@ export class MNTBridgeService {
     );
   }
 
-  private async getBalances() {
-    const l1Balance = await this.l1MntToken.balanceOf(this.ourAddr);
+  private async getBalances(ourAddr: string) {
+    if (!this.crossChainMessenger) await this.init();
+    const l1Balance = await this.l1MntToken.balanceOf(ourAddr);
     const l2Balance = await this.crossChainMessenger.l2Signer.getBalance();
-    return { l1Balance, l2Balance, address: this.ourAddr };
+    return { l1Balance, l2Balance, address: ourAddr };
   }
 
   @Tool({
     name: "deposit_mnt",
     description: "Deposit MNT tokens from L1 to L2 on Mantle",
   })
-  async depositMNT(parameters: DepositParameters) {
+  async depositMNT(
+    walletClient: EVMWalletClient,
+    parameters: DepositParameters
+  ) {
+    if (!this.crossChainMessenger) await this.init();
+    const ourAddr = walletClient.getAddress();
+    assert(
+      ourAddr === (await this.l1Signer.getAddress()),
+      "Signer address does not match"
+    );
     const amount = parameters.amount;
 
     const allowanceTx = await this.crossChainMessenger.approveERC20(
@@ -71,14 +84,23 @@ export class MNTBridgeService {
       MessageStatus.RELAYED
     );
 
-    return await this.getBalances();
+    return await this.getBalances(ourAddr);
   }
 
   @Tool({
     name: "withdraw_mnt",
     description: "Withdraw MNT tokens from L2 to L1 on Mantle",
   })
-  async withdraw(parameters: WithdrawParameters) {
+  async withdrawMNT(
+    walletClient: EVMWalletClient,
+    parameters: WithdrawParameters
+  ) {
+    if (!this.crossChainMessenger) await this.init();
+    const ourAddr = walletClient.getAddress();
+    assert(
+      ourAddr === (await this.l1Signer.getAddress()),
+      "Signer address does not match"
+    );
     const amount = parameters.amount;
 
     const withdrawTx = await this.crossChainMessenger.withdrawMNT(amount);
@@ -105,14 +127,6 @@ export class MNTBridgeService {
       MessageStatus.RELAYED
     );
 
-    return await this.getBalances();
-  }
-
-  @Tool({
-    name: "get_mnt_balances",
-    description: "Get current MNT token balances on L1 and L2",
-  })
-  async balances() {
-    return await this.getBalances();
+    return await this.getBalances(ourAddr);
   }
 }

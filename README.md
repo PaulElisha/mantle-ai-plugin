@@ -87,7 +87,7 @@ async function main() {
         l1MntTokenAddress: "0x...",
         l2MntTokenAddress: "0x..."
     });
-    await bridgeService.init(); // Important: initialize the service
+    // Service automatically initializes on first use
     */
 
   // 3. Create the plugin with the services you want to enable
@@ -104,13 +104,13 @@ async function main() {
 
 ### Supported Services
 
-| Service               | Description                               | Config Required?                                     |
-| :-------------------- | :---------------------------------------- | :--------------------------------------------------- |
-| `AccountServices`     | Get account balance, NFT/ERC20 holdings   | **Yes** (Explorer API Key)                           |
-| `TransactionServices` | Get transaction history and block info    | **Yes** (Explorer API Key)                           |
-| `TransferServices`    | Transfer ETH, MNT, ERC20, ERC721, ERC1155 | No                                                   |
-| `MNTBridgeService`    | Deposit/Withdraw MNT between L1 and L2    | **Yes** (Signers, Chain IDs, Token Addrs) + `init()` |
-| `ERC20BridgeService`  | Deposit/Withdraw ERC20 between L1 and L2  | **Yes** (Signers, Chain IDs, Token Addrs) + `init()` |
+| Service               | Description                               | Config Required?                          |
+| :-------------------- | :---------------------------------------- | :---------------------------------------- |
+| `AccountServices`     | Get account balance, NFT/ERC20 holdings   | **Yes** (Explorer API Key)                |
+| `TransactionServices` | Get transaction history and block info    | **Yes** (Explorer API Key)                |
+| `TransferServices`    | Transfer ETH, MNT, ERC20, ERC721, ERC1155 | No                                        |
+| `MNTBridgeService`    | Deposit/Withdraw MNT between L1 and L2    | **Yes** (Signers, Chain IDs, Token Addrs) |
+| `ERC20BridgeService`  | Deposit/Withdraw ERC20 between L1 and L2  | **Yes** (Signers, Chain IDs, Token Addrs) |
 
 > **Note**: Web3 Data tools (Account/Transaction services) rely on Explorer APIs. Ensure you provide a valid API key when initializing the service.
 
