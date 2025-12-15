@@ -1,0 +1,33 @@
+{
+        "$schema": "https://json.schemastore.org/tsconfig",
+        "compilerOptions": {
+                "module": "esnext",
+                "target": "es2017",
+                "moduleResolution": "node",
+                "strict": true,
+                "esModuleInterop": true,
+                "isolatedModules": true,
+                "resolveJsonModule": true,
+                "declaration": true,
+                "declarationMap": true,
+                "sourceMap": true,
+                "outDir": "dist",
+                "noEmitOnError": true,
+                "forceConsistentCasingInFileNames": true,
+                "lib": [
+                        "dom",
+                        "esnext"
+                ],
+                "noErrorTruncation": true,
+                "emitDecoratorMetadata": true,
+                "experimentalDecorators": true
+        },
+        "include": [
+                "src/services/**/*",
+                "src/utils/*"
+        ],
+        "exclude": [
+                "node_modules",
+                "dist"
+        ]
+}
