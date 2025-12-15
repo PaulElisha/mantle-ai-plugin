@@ -5,15 +5,13 @@ import { createToolParameters } from "@goat-sdk/core";
 
 export class BaseAccountsParameters extends createToolParameters(
   z.object({
-    address: z.string(),
-    network: z.string(),
+    apikey: z.string(),
   })
 ) {}
 
 export class GetNFTBalanceParameters extends createToolParameters(
   z.object({
-    address: z.string(),
-    network: z.string(),
+    apikey: z.string(),
     page: z.string(),
     offset: z.string(),
   })
@@ -21,8 +19,7 @@ export class GetNFTBalanceParameters extends createToolParameters(
 
 export class GetERC20BalanceParameters extends createToolParameters(
   z.object({
-    address: z.string(),
-    network: z.string(),
+    apikey: z.string(),
     page: z.string(),
     offset: z.string(),
   })
@@ -36,25 +33,26 @@ export class GetTransactionsByAccountParameters extends createToolParameters(
     endblock: z.string(),
     page: z.string(),
     offset: z.string(),
+    apikey: z.string(),
   })
 ) {}
 
 export class GetTransactionsByBlockNumberParameters extends createToolParameters(
   z.object({
-    blockNumber: z.number(),
-    network: z.string(),
+    blockNumber: z.string(),
+    apikey: z.string(),
   })
 ) {}
 
 export class GetBlockInfoParameters extends createToolParameters(
   z.object({
     blockNumber: z.string(),
-    network: z.string(),
+    apikey: z.string(),
   })
 ) {}
 
 export class GetLatestBlockParameters extends createToolParameters(
   z.object({
-    network: z.string(),
+    apikey: z.string(),
   })
 ) {}

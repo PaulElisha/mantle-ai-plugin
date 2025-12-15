@@ -14,8 +14,7 @@ export class TransferErc20Parameters extends createToolParameters(
     receiver: z.string(),
     amount: z.bigint(),
     contractAddress: z.string(),
-    type: z.enum(["erc20", "erc721", "erc1155"]),
-    network: z.enum(["testnet", "mainnet"]),
+    type: z.enum(["erc20"]),
   })
 ) {}
 
@@ -26,7 +25,6 @@ export class TransferErc721Parameters extends createToolParameters(
     amount: z.bigint(),
     type: z.enum(["erc721"]),
     contractAddress: z.string(),
-    network: z.enum(["testnet", "mainnet"]),
   })
 ) {}
 
@@ -35,8 +33,8 @@ export class TransferErc1155Parameters extends createToolParameters(
     receiver: z.string(),
     amount: z.number(),
     tokenId: z.string(),
+    type: z.enum(["erc1155"]),
     contractAddress: z.string(),
-    network: z.enum(["testnet", "mainnet"]),
   })
 ) {}
 
@@ -47,6 +45,5 @@ export class TransferNativeTokenParameters extends createToolParameters(
     tokenId: z.string(),
     type: z.enum(["erc20", "erc721", "erc1155"]),
     contractAddress: z.string(),
-    network: z.enum(["testnet", "mainnet"]),
   })
 ) {}

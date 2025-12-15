@@ -3,6 +3,7 @@ import { AbiFactory, TokenTransferPayload } from "../../utils/token";
 import { getContractDecimals, formatTokenAmount } from "../../utils/helper";
 import { parseEther } from "viem";
 import { Tool } from "@goat-sdk/core";
+import { EVMWalletClient } from "@goat-sdk/wallet-evm";
 import {
   TransferErc20Parameters,
   TransferErc721Parameters,
@@ -18,17 +19,13 @@ export class TransferServices {
     description: "Transfer ERC20 token",
   })
   async transferErc20(
+    walletClient: EVMWalletClient,
     parameters: TransferErc20Parameters &
-      Omit<TokenTransferPayload, "type" | "tokenId">,
-    config: any,
-    walletClient: any
+      Omit<TokenTransferPayload, "type" | "tokenId">
   ) {
     const { amount, contractAddress } = parameters;
     try {
-      const sender =
-        walletClient.address ||
-        walletClient.account?.address ||
-        walletClient.getAddress();
+      const sender = walletClient.getAddress();
 
       // Get the token decimals
       const decimals = await getContractDecimals(contractAddress, walletClient);
@@ -62,20 +59,17 @@ export class TransferServices {
     description: "Transfer ERC721 token",
   })
   async transferErc721(
+    walletClient: EVMWalletClient,
     parameters: TransferErc721Parameters &
-      Omit<TokenTransferPayload, "type" | "amount">,
-    config: any,
-    walletClient: any
+      Omit<TokenTransferPayload, "type" | "amount">
   ) {
+    const { contractAddress } = parameters;
     try {
-      const sender =
-        walletClient.address ||
-        walletClient.account?.address ||
-        walletClient.getAddress();
+      const sender = walletClient.getAddress();
 
       const tx: any = {
         from: sender,
-        to: parameters.contractAddress,
+        to: contractAddress,
         data: new AbiFactory({
           ...(parameters as Partial<TokenTransferPayload>),
           type: "erc721",
@@ -97,19 +91,16 @@ export class TransferServices {
     description: "Transfer ERC1155 token",
   })
   async transferErc1155(
-    parameters: TransferErc1155Parameters & Omit<TokenTransferPayload, "type">,
-    config: any,
-    walletClient: any
+    walletClient: EVMWalletClient,
+    parameters: TransferErc1155Parameters & Omit<TokenTransferPayload, "type">
   ) {
+    const { contractAddress } = parameters;
     try {
-      const sender =
-        walletClient.address ||
-        walletClient.account?.address ||
-        walletClient.getAddress();
+      const sender = walletClient.getAddress();
 
       const tx: any = {
         from: sender,
-        to: parameters.contractAddress,
+        to: contractAddress,
         data: new AbiFactory({
           ...(parameters as Partial<TokenTransferPayload>),
           type: "erc1155",
@@ -132,21 +123,18 @@ export class TransferServices {
     description: "Transfer native token",
   })
   async transferNativeToken(
+    walletClient: EVMWalletClient,
     parameters: TransferNativeTokenParameters &
-      Omit<TokenTransferPayload, "type" | "tokenId" | "contractAddress">,
-    config: any,
-    walletClient: any
+      Omit<TokenTransferPayload, "type" | "tokenId" | "contractAddress">
   ) {
+    const { receiver, amount } = parameters;
     try {
-      const sender =
-        walletClient.address ||
-        walletClient.account?.address ||
-        walletClient.getAddress();
+      const sender = walletClient.getAddress();
 
       const tx: any = {
         from: sender,
-        to: parameters.receiver,
-        value: parseEther(parameters.amount),
+        to: receiver,
+        value: parseEther(amount),
       };
 
       const sentTx = await walletClient.sendTransaction(tx);

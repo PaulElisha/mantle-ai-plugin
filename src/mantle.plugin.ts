@@ -4,11 +4,8 @@ import { Chain, PluginBase } from "@goat-sdk/core";
 import { EVMWalletClient } from "@goat-sdk/wallet-evm";
 
 export class MantleAIPlugin extends PluginBase<EVMWalletClient> {
-  private config: Record<string, unknown>;
-
-  constructor(config: Record<string, unknown> = {}, services: []) {
+  constructor(services: Array<any>) {
     super("mantle", services);
-    this.config = config;
   }
 
   supportsChain = (chain: Chain) => {
@@ -16,9 +13,6 @@ export class MantleAIPlugin extends PluginBase<EVMWalletClient> {
   };
 }
 
-export function MantlePlugin(
-  config: Record<string, unknown> = {},
-  services: []
-) {
-  return new MantleAIPlugin(config, services);
+export function MantlePlugin(services: Array<any>) {
+  return new MantleAIPlugin(services);
 }

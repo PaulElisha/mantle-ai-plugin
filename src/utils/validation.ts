@@ -14,10 +14,4 @@ validations.checkAddress = (address: any) => {
   return isAddress(address);
 };
 
-validations.checkNetwork = (network: any) => {
-  if (network !== "kairos" && network !== "kaia") {
-    throw new Error("Invalid network");
-  }
-};
-
 export { validations };

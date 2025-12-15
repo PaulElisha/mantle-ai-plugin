@@ -2,12 +2,13 @@
 import { validations } from "../../utils/validation";
 import { API_CONFIG } from "../../utils/constants";
 import { Tool } from "@goat-sdk/core";
+import { EVMWalletClient } from "@goat-sdk/wallet-evm";
 import {
   GetBlockInfoParameters,
   GetLatestBlockParameters,
   GetTransactionsByAccountParameters,
   GetTransactionsByBlockNumberParameters,
-} from "./para"
+} from "./parameters";
 
 export class TransactionServices {
   constructor() {}
@@ -16,26 +17,27 @@ export class TransactionServices {
     name: "get_block_info",
     description: "Get block info by block number",
   })
-  async getBlockInfo(parameters: GetBlockInfoParameters, config: any) {
-    let ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY;
-    let { blockNumber, network } = parameters;
-    network = network ? network.toLowerCase() : "kairos";
+  async getBlockInfo(
+    walletClient: EVMWalletClient,
+    parameters: GetBlockInfoParameters
+  ) {
+    let { blockNumber, apikey } = parameters;
+    const chainid = walletClient.getChain().id as unknown as string;
 
-    validations.checkApiKey(ETHERSCAN_API_KEY);
-    validations.checkNetwork(network);
+    validations.checkApiKey(apikey);
 
     const blockNumberHex = `0x${blockNumber}`;
 
     const params = new URLSearchParams({
-      chainid: API_CONFIG.CHAIN_ID[network],
+      chainid,
       module: "proxy",
       action: "eth_getBlockByNumber",
       tag: blockNumberHex,
       boolean: "true",
-      apikey: ETHERSCAN_API_KEY,
+      apikey,
     });
 
-    const response = await fetch(`${API_CONFIG.BASE_URL[network]}?${params}`, {
+    const response = await fetch(`${API_CONFIG.BASE_URL}?${params}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -53,7 +55,6 @@ export class TransactionServices {
       datetime: data.datetime,
       hash: data.hash,
       totalTransactionCount: data.total_transaction_count,
-      network: network,
     };
   }
 
@@ -61,22 +62,23 @@ export class TransactionServices {
     name: "get_latest_block",
     description: "Get the latest block number",
   })
-  async getLatestBlock(parameters: GetLatestBlockParameters, config: any) {
-    let ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY;
-    let { network } = parameters;
-    network = network ? network.toLowerCase() : "kairos";
+  async getLatestBlock(
+    walletClient: EVMWalletClient,
+    parameters: GetLatestBlockParameters
+  ) {
+    let { apikey } = parameters;
+    const chainid = walletClient.getChain().id as unknown as string;
 
-    validations.checkApiKey(ETHERSCAN_API_KEY);
-    validations.checkNetwork(network);
+    validations.checkApiKey(apikey);
 
     const params = new URLSearchParams({
-      chainid: API_CONFIG.CHAIN_ID[network],
+      chainid,
       module: "proxy",
       action: "eth_blockNumber",
-      apikey: ETHERSCAN_API_KEY,
+      apikey,
     });
 
-    const response = await fetch(`${API_CONFIG.BASE_URL[network]}?${params}`, {
+    const response = await fetch(`${API_CONFIG.BASE_URL}?${params}`, {
       method: "GET",
       headers: { Accept: "*/*" },
     });
@@ -93,8 +95,8 @@ export class TransactionServices {
     }
 
     return {
+      chainid,
       blockId: parseInt(data.result, 16),
-      network: network,
     };
   }
 
@@ -103,19 +105,17 @@ export class TransactionServices {
     description: "Get the transactions by account",
   })
   async getTransactionsByAccount(
-    parameters: GetTransactionsByAccountParameters,
-    config: any
+    walletClient: EVMWalletClient,
+    parameters: GetTransactionsByAccountParameters
   ) {
-    let ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY;
-    let { address, network, startblock, endblock, page, offset } = parameters;
-    network = network ? network.toLowerCase() : "kairos";
+    let { startblock, endblock, page, offset, apikey } = parameters;
+    const chainid = walletClient.getChain().id as unknown as string;
+    const address = walletClient.getAddress();
 
-    validations.checkApiKey(ETHERSCAN_API_KEY);
     validations.checkAddress(address);
-    validations.checkNetwork(network);
 
     const params = new URLSearchParams({
-      chainid: API_CONFIG.CHAIN_ID[network],
+      chainid,
       module: "account",
       action: "txlist",
       address,
@@ -124,10 +124,10 @@ export class TransactionServices {
       page,
       offset,
       sort: "desc",
-      apikey: ETHERSCAN_API_KEY,
+      apikey,
     });
 
-    const response = await fetch(`${API_CONFIG.BASE_URL[network]}?${params}`, {
+    const response = await fetch(`${API_CONFIG.BASE_URL}?${params}`, {
       method: "GET",
       headers: { Accept: "*/*" },
     });
@@ -156,7 +156,7 @@ export class TransactionServices {
 
     return {
       address,
-      network,
+      chainid,
       transactions,
       totalCount: Array.isArray(data.result) ? data.result.length : 0,
     };
@@ -167,28 +167,26 @@ export class TransactionServices {
     description: "Get the transactions by block number",
   })
   async getTransactionsByBlockNumber(
-    parameters: GetTransactionsByBlockNumberParameters,
-    config: any
+    walletClient: EVMWalletClient,
+    parameters: GetTransactionsByBlockNumberParameters
   ) {
-    let ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY;
-    let { blockNumber, network } = parameters;
-    network = network ? network.toLowerCase() : "kairos";
+    let { blockNumber, apikey } = parameters;
+    const chainid = walletClient.getChain().id as unknown as string;
 
-    validations.checkApiKey(ETHERSCAN_API_KEY);
-    validations.checkNetwork(network);
+    validations.checkApiKey(apikey);
 
     const blockNumberHex = "0x" + Number(blockNumber).toString(16);
 
     const params = new URLSearchParams({
-      chainid: API_CONFIG.CHAIN_ID[network],
+      chainid,
       module: "proxy",
       action: "eth_getBlockByNumber",
       tag: blockNumberHex,
       boolean: "true",
-      apikey: ETHERSCAN_API_KEY,
+      apikey,
     });
 
-    const response = await fetch(`${API_CONFIG.BASE_URL[network]}?${params}`, {
+    const response = await fetch(`${API_CONFIG.BASE_URL}?${params}`, {
       method: "GET",
       headers: { Accept: "*/*" },
     });
@@ -217,7 +215,7 @@ export class TransactionServices {
 
     return {
       blockNumber,
-      network,
+      chainid,
       transactions,
       totalCount: data.paging?.total_count || 0,
     };

@@ -3,6 +3,7 @@
 import { validations } from "../../utils/validation";
 import { API_CONFIG } from "../../utils/constants";
 import { Tool } from "@goat-sdk/core";
+import { EVMWalletClient } from "@goat-sdk/wallet-evm";
 import {
   BaseAccountsParameters,
   GetNFTBalanceParameters,
@@ -17,19 +18,20 @@ export class AccountServices {
     description:
       "Get the Account Overview for a given address and network (kaia or kairos)",
   })
-  async getAccountOverview(parameters: BaseAccountsParameters, config: any) {
-    let ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY;
-    let { address, network } = parameters;
-    network = network ? network.toLowerCase() : "testnet";
+  async getAccountOverview(
+    walletClient: EVMWalletClient,
+    parameters: BaseAccountsParameters
+  ) {
+    let { apikey } = parameters;
+    const chainid = walletClient.getChain().id as unknown as string;
+    const address = walletClient.getAddress();
 
-    validations.checkApiKey(ETHERSCAN_API_KEY);
-    validations.checkAddress(address);
-    validations.checkNetwork(network);
+    validations.checkApiKey(apikey);
 
     const baseParams = {
-      chainid: API_CONFIG.CHAIN_ID[network],
+      chainid,
       tag: "latest",
-      apikey: ETHERSCAN_API_KEY,
+      apikey,
     };
 
     const balanceParams = new URLSearchParams({
@@ -47,11 +49,11 @@ export class AccountServices {
     });
 
     const [balanceRes, txCountRes] = await Promise.all([
-      fetch(`${API_CONFIG.BASE_URL[network]}?${balanceParams}`, {
+      fetch(`${API_CONFIG.BASE_URL}?${balanceParams}`, {
         method: "GET",
         headers: { Accept: "*/*" },
       }),
-      fetch(`${API_CONFIG.BASE_URL[network]}?${txCountParams}`, {
+      fetch(`${API_CONFIG.BASE_URL}?${txCountParams}`, {
         method: "GET",
         headers: { Accept: "*/*" },
       }),
@@ -71,7 +73,6 @@ export class AccountServices {
 
     return {
       address,
-      network,
       balance: balanceData.result,
       totalTransactionCount: parseInt(txCountData.result, 16),
     };
@@ -82,26 +83,28 @@ export class AccountServices {
     description:
       "Get the Non-Fungible token or nft or erc721 balances for a given address and network",
   })
-  async getNFTBalance(parameters: GetNFTBalanceParameters, config: any) {
-    let ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY;
-    let { address, network, page, offset } = parameters;
-    network = network ? network.toLowerCase() : "testnet";
+  async getNFTBalance(
+    walletClient: EVMWalletClient,
+    parameters: GetNFTBalanceParameters
+  ) {
+    let { apikey, offset, page } = parameters;
+    const chainid = walletClient.getChain().id as unknown as string;
+    const address = walletClient.getAddress();
 
-    validations.checkApiKey(ETHERSCAN_API_KEY);
+    validations.checkApiKey(apikey);
     validations.checkAddress(address);
-    validations.checkNetwork(network);
 
     const params = new URLSearchParams({
-      chainid: API_CONFIG.CHAIN_ID[network],
+      chainid,
       module: "account",
       action: "addresstokennftbalance",
-      address: address,
+      address,
       page,
       offset,
-      apikey: ETHERSCAN_API_KEY,
+      apikey,
     });
 
-    const url = `${API_CONFIG.BASE_URL[network]}?${params}`;
+    const url = `${API_CONFIG.BASE_URL}?${params}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -125,7 +128,6 @@ export class AccountServices {
 
     return {
       address,
-      network,
       collections,
       totalCount: data.paging.total_count,
     };
@@ -136,26 +138,28 @@ export class AccountServices {
     description:
       "Get the Fungible token or ft or erc20 balances for a given address and network",
   })
-  async getERC20Balance(parameters: GetERC20BalanceParameters, config: any) {
-    let ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY;
-    let { address, network, page, offset } = parameters;
-    network = network ? network.toLowerCase() : "testnet";
+  async getERC20Balance(
+    walletClient: EVMWalletClient,
+    parameters: GetERC20BalanceParameters
+  ) {
+    let { apikey, offset, page } = parameters;
+    const chainid = walletClient.getChain().id as unknown as string;
+    const address = walletClient.getAddress();
 
-    validations.checkApiKey(ETHERSCAN_API_KEY);
+    validations.checkApiKey(apikey);
     validations.checkAddress(address);
-    validations.checkNetwork(network);
 
     const params = new URLSearchParams({
-      chainid: API_CONFIG.CHAIN_ID[network],
+      chainid,
       module: "account",
       action: "addresstokenbalance",
       address,
       page,
       offset,
-      apikey: ETHERSCAN_API_KEY,
+      apikey,
     });
 
-    const url = `${API_CONFIG.BASE_URL[network]}?${params}`;
+    const url = `${API_CONFIG.BASE_URL}?${params}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -184,7 +188,6 @@ export class AccountServices {
 
     return {
       address,
-      network,
       tokens,
       totalCount: data?.paging?.total_count,
     };
@@ -194,26 +197,28 @@ export class AccountServices {
     name: "get_current_balance",
     description: "Get the current balance for a given address and network",
   })
-  async getCurrentBalance(parameters: BaseAccountsParameters, config: any) {
+  async getCurrentBalance(
+    walletClient: EVMWalletClient,
+    parameters: BaseAccountsParameters
+  ) {
     try {
-      let ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY;
-      let { address, network } = parameters;
-      network = network ? network.toLowerCase() : "testnet";
+      let { apikey } = parameters;
+      const chainid = walletClient.getChain().id as unknown as string;
+      const address = walletClient.getAddress();
 
-      validations.checkApiKey(ETHERSCAN_API_KEY);
+      validations.checkApiKey(apikey);
       validations.checkAddress(address);
-      validations.checkNetwork(network);
 
       const params = new URLSearchParams({
-        chainid: API_CONFIG.CHAIN_ID[network],
+        chainid,
         module: "account",
         action: "balance",
-        address: address,
+        address,
         tag: "latest",
-        apikey: ETHERSCAN_API_KEY,
+        apikey,
       });
 
-      const url = `${API_CONFIG.BASE_URL[network]}?${params}`;
+      const url = `${API_CONFIG.BASE_URL}?${params}`;
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -231,7 +236,6 @@ export class AccountServices {
       return {
         address,
         balance: data.balance,
-        network,
       };
     } catch (error: any) {
       throw new Error(`Failed to fetch current balance: ${error.message}`);
